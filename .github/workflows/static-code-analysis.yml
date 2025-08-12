@@ -2,19 +2,25 @@ name: static-code-analysis
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: '0'
-      - uses: akaihola/darker@v2.1.1
-        with:
-          options: "--check --diff --revision=origin/main..."
-          src: "."
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: '0'
+    - uses: clonedSemicolon/setup-strace@v13
+    - uses: akaihola/darker@v2.1.1
+      with:
+        options: "--check --diff --revision=origin/main..."
+        src: "."
+    - name: Upload strace artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: strace-logs-${{ github.job }}-${{ matrix.flavor || 'lint' }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ strategy.job-index || 0 }}
+        path: /home/runner/strace_logs/
